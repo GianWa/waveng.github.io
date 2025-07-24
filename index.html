@@ -39,42 +39,22 @@
       minWidth: 200.00,
       scale: 1.0,
       scaleMobile: 1.0,
-      color: 0x042c44,          // blu scuro
-      shininess: 40.0,
-      waveHeight: 15.0,         // onde più basse
-      waveSpeed: 0.02,          // calma iniziale
-      zoom: 1.1,
-      points: 75.0              // griglia molto più fine
+      color: 0x042c44,
+      shininess: 30.0,
+      waveHeight: 15.0,
+      waveSpeed: 0.02,   // calma iniziale
+      zoom: 1.0,
+      points: 75.0
     });
 
-    let lastMouseX = 0;
-    let lastMouseY = 0;
-    let lastMoveTime = Date.now();
-
-    document.addEventListener("mousemove", (e) => {
-      const now = Date.now();
-      const dx = e.clientX - lastMouseX;
-      const dy = e.clientY - lastMouseY;
-      const distance = Math.sqrt(dx*dx + dy*dy);
-      const dt = now - lastMoveTime;
-      const speed = dt > 0 ? distance / dt : 0;
-
-      // Mappa la velocità su waveSpeed: da 0.02 (quasi fermo) a 1.0 (molto mosso)
-      let waveSpeed = Math.min(1.0, Math.max(0.02, speed * 0.25));
-      vantaEffect.setOptions({ waveSpeed });
-
-      lastMouseX = e.clientX;
-      lastMouseY = e.clientY;
-      lastMoveTime = now;
-    });
-
-    // Se non si muove il mouse per 2 secondi, torna calmo
-    setInterval(() => {
-      const now = Date.now();
-      if (now - lastMoveTime > 2000) {
+    // Mouse movement = leggero aumento della velocità
+    document.addEventListener("mousemove", () => {
+      vantaEffect.setOptions({ waveSpeed: 0.2 });
+      clearTimeout(window._resetWaves);
+      window._resetWaves = setTimeout(() => {
         vantaEffect.setOptions({ waveSpeed: 0.02 });
-      }
-    }, 500);
+      }, 1000); // dopo 1 secondo torna calmo
+    });
   </script>
 </body>
 </html>
