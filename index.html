@@ -7,54 +7,94 @@
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
       overflow: hidden;
+      height: 100%;
       font-family: sans-serif;
       color: white;
-      text-align: center;
     }
-    #vanta-bg {
-      width: 100%;
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
       height: 100%;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       flex-direction: column;
+      text-align: center;
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
 </head>
 <body>
-  <div id="vanta-bg">
+  <canvas id="waveCanvas"></canvas>
+  <div class="content">
     <h1>Hello wave!<br>WEC-Pro project website – work in progress!</h1>
   </div>
 
   <script>
-    let vantaEffect = VANTA.WAVES({
-      el: "#vanta-bg",
-      mouseControls: false,
-      touchControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.0,
-      scaleMobile: 1.0,
-      color: 0x042c44,
-      shininess: 30.0,
-      waveHeight: 15.0,
-      waveSpeed: 0.02,   // calma iniziale
-      zoom: 1.0,
-      points: 75.0
+    const canvas = document.getElementById("waveCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener("resize", () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
     });
 
-    // Mouse movement = leggero aumento della velocità
-    document.addEventListener("mousemove", () => {
-      vantaEffect.setOptions({ waveSpeed: 0.2 });
-      clearTimeout(window._resetWaves);
-      window._resetWaves = setTimeout(() => {
-        vantaEffect.setOptions({ waveSpeed: 0.02 });
-      }, 1000); // dopo 1 secondo torna calmo
+    const waves = [];
+    const numWaves = 5;
+    for (let i = 0; i < numWaves; i++) {
+      waves.push({
+        amplitude: 10 + Math.random() * 20,
+        frequency: 0.01 + Math.random() * 0.01,
+        phase: Math.random() * 2 * Math.PI,
+        speed: 0.02 + Math.random() * 0.02,
+        color: `rgba(10, 60, 100, ${0.1 + i * 0.1})`
+      });
+    }
+
+    let speedFactor = 0.2;
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      waves.forEach(wave => {
+        wave.phase += wave.speed * speedFactor;
+        ctx.beginPath();
+        for (let x = 0; x < width; x++) {
+          const y = height / 2 + Math.sin(x * wave.frequency + wave.phase) * wave.amplitude;
+          ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = wave.color;
+        ctx.stroke();
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    let lastMoveTime = Date.now();
+    document.addEventListener("mousemove", (e) => {
+      speedFactor = 1.0;
+      lastMoveTime = Date.now();
     });
+
+    setInterval(() => {
+      const now = Date.now();
+      if (now - lastMoveTime > 1000) {
+        speedFactor = 0.2;
+      }
+    }, 100);
   </script>
 </body>
 </html>
