@@ -10,7 +10,7 @@
       overflow: hidden;
       height: 100%;
       font-family: sans-serif;
-      color: white;
+      background: #fff;
     }
 
     canvas {
@@ -29,6 +29,8 @@
       align-items: center;
       flex-direction: column;
       text-align: center;
+      transform: translateY(-20%); /* più in alto */
+      color: #111; /* testo nero */
     }
   </style>
 </head>
@@ -84,14 +86,13 @@
     draw();
 
     let lastMoveTime = Date.now();
-    document.addEventListener("mousemove", (e) => {
+    document.addEventListener("mousemove", () => {
       speedFactor = 1.0;
       lastMoveTime = Date.now();
     });
 
     setInterval(() => {
-      const now = Date.now();
-      if (now - lastMoveTime > 1000) {
+      if (Date.now() - lastMoveTime > 1000) {
         speedFactor = 0.2;
       }
     }, 100);
